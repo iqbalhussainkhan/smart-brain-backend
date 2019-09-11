@@ -31,18 +31,40 @@ app.post('/signin', (req, res) => {
 
 	let { email, password } = req.body;
 
-	db('login')
-	.join('users','users.email','login.email')
-	.where({'login.email': email,'hash': password}).select('*')
-	.select('*')
+	db.select('email','hash')
+	.from('login')
+	.where({email})
 	.then(user => {
+		console.log(user[0])
 		if(user.length){
-			res.json(user[0]);
+			let hash = bcrypt.compareSync(password, user[0].hash);
+			console.log(hash)
+			if(hash)
+				db.select('*')
+				.from('users')
+				.where('email',user[0].email)
+				.then(user => res.json(user[0]))
+			else
+				res.status(404).json('wrong credintials')
+		}else{
+			res.status(404).json('wrong credintials');
 		}
-		else
-			res.status(404).json('incorrect user name or password');
 	})
-	.catch(err => res.status(400).json('bad request'));
+	.catch(err => res.status(400).json('request cannot complete please try again later'))
+
+
+	// db('login')
+	// .join('users','users.email','login.email')
+	// .where({'login.email': email,'hash': password}).select('*')
+	// .select('*')
+	// .then(user => {
+	// 	if(user.length){
+	// 		res.json(user[0]);
+	// 	}
+	// 	else
+	// 		res.status(404).json('incorrect user name or password');
+	// })
+	// .catch(err => res.status(400).json('bad request'));
 
 
 })
@@ -51,9 +73,6 @@ app.post('/signin', (req, res) => {
 app.post('/register', (req,res) => {
 	let { name, email, password } = req.body;
 	var hash = bcrypt.hashSync(password);
-
-// bcrypt.compareSync("bacon", hash); // true
-// bcrypt.compareSync("veggies", hash); // false
 
 	db.transaction(trx => {
 		trx('login')
@@ -79,30 +98,6 @@ app.post('/register', (req,res) => {
 	}).catch(err => res.status(404).json('cannot add user'));
 })
 
-// 	db.transaction(trx => {
-// 		trx.insert({
-// 			hash: hash,
-// 			email: email
-// 		})
-// 		.into('login')
-// 		.returning('email')
-// 		.then(loginEmail => {
-// 			return trx('users')
-// 			.returning('*')
-// 			.insert({
-// 				email: loginEmail[0],
-// 				name: name,
-// 				joined: new Date()
-// 			})
-// 			.then(user => {
-// 				res.json(user[0])
-// 			})
-// 		})
-// 		.then(trx.commit)
-// 		.catch(trx.rollback)
-// 	})
-// 	.catch(err => res.status(400).json('unable to register'));	
-// })
 
 // get user profile by search
 app.get('/profile/:id', (req, res) => {
