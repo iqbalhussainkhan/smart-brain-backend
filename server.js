@@ -16,26 +16,6 @@ let db = knex({
     database : 'smartbrain'
   }
 });
-let database = {
-	users: [
-		{
-			id:1,
-			name:'iqbal',
-			email:'iqbalkhan@yahoo.com',
-			password:'khanjan',
-			entries:0,
-			joined: new Date()
-		},
-		{
-			id:2,
-			name:'jawad',
-			email:'jawad@yahoo.com',
-			password:'jawadkhan',
-			entries:0,
-			joined: new Date()
-		}
-	]
-}
 
 let app = express();
 app.use(bodyParser.json());
@@ -58,7 +38,6 @@ app.post('/signin', (req, res) => {
 	.then(user => {
 		if(user.length){
 			res.json(user[0]);
-			console.log(user[0].email);
 		}
 		else
 			res.status(404).json('incorrect user name or password');
@@ -71,18 +50,59 @@ app.post('/signin', (req, res) => {
 //register route for new user 
 app.post('/register', (req,res) => {
 	let { name, email, password } = req.body;
+	var hash = bcrypt.hashSync(password);
 
-	let user = db('users')
-	.returning('*')
-	.insert({
-		name: name,
-		email:email,
-		joined: new Date(),
-	}).then(user => {
-		res.json(user[0])
-	})
-	.catch(err => res.status(400).json('unable to register'));
+// bcrypt.compareSync("bacon", hash); // true
+// bcrypt.compareSync("veggies", hash); // false
+
+	db.transaction(trx => {
+		trx('login')
+		.returning('email')
+		.insert({
+			hash: hash,
+			email: email
+		})
+		.then(loginEmail => {
+			return trx('users')
+			.returning('*')	
+			.insert({
+				name: name,
+				email: loginEmail[0],
+				joined: new Date()
+			})
+			.then(user => {
+				res.json(user[0])
+			})
+		})
+		.then(trx.commit)
+		.catch(trx.rollback)
+	}).catch(err => res.status(404).json('cannot add user'));
 })
+
+// 	db.transaction(trx => {
+// 		trx.insert({
+// 			hash: hash,
+// 			email: email
+// 		})
+// 		.into('login')
+// 		.returning('email')
+// 		.then(loginEmail => {
+// 			return trx('users')
+// 			.returning('*')
+// 			.insert({
+// 				email: loginEmail[0],
+// 				name: name,
+// 				joined: new Date()
+// 			})
+// 			.then(user => {
+// 				res.json(user[0])
+// 			})
+// 		})
+// 		.then(trx.commit)
+// 		.catch(trx.rollback)
+// 	})
+// 	.catch(err => res.status(400).json('unable to register'));	
+// })
 
 // get user profile by search
 app.get('/profile/:id', (req, res) => {
@@ -115,13 +135,6 @@ app.put('/image/:id', (req,res) => {
 	  		else
 	  			res.json('0')
 	  }).catch(err => res.send('bad request'));
-	// database.users.forEach(( user ) => {
-	// 	if(user.id === parseInt(id)){
-	// 		user.entries++
-	// 		return res.json(user.entries)
-	// 	}
-	// })
-	// res.status(404).json('user not found')
 })
 
 
