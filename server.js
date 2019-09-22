@@ -28,6 +28,7 @@ app.use(cors())
 
 //home page 
 app.get('/', (req,res) => {
+	res.json('ITS WORKING')
 	console.log('its workings');
 	// res.json(database.users)
 })
@@ -51,6 +52,6 @@ app.post('/handleAPICall', (req,res) => {image.handleAPICall(req, res)});
 
 
 app.listen(process.env.PORT || 3000, () => {
-	console.log(`APP is runnining on ${process.env.PORT}`)
+	console.log(`APP is runnining on PORT:${process.env.PORT}`)
 })
 
