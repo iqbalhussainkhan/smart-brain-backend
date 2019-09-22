@@ -15,7 +15,7 @@ const image = require('./controller/image');
 let db = knex({
   client: 'pg',
   connection: {
-    host : '127.0.0.1', /*process.env.DATABASE*/
+    host : 'postgresql-tetrahedral-37877',
     user : 'postgres',
     password : 'test',
     database : 'smartbrain'
@@ -29,7 +29,7 @@ app.use(cors())
 //home page 
 app.get('/', (req,res) => {
 	res.json('ITS WORKING')
-	console.log('its workings');
+	// console.log('its workings');
 	// res.json(database.users)
 })
 
