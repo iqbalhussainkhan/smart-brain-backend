@@ -46,7 +46,7 @@ app.get('/profile/:id', (req, res) => {profile.handleProfile(req,res,db)});
 app.put('/image/:id', (req,res) => {image.handleImage(req, res, db)});
 
 //handle api call for iamge
-app.put('/handleAPICall', (req,res) => {image.handleAPICall(req, res)});
+app.post('/handleAPICall', (req,res) => {image.handleAPICall(req, res)});
 
 
 app.listen(4000, () => {

@@ -1,8 +1,3 @@
-import Clarifai from 'clarifai';
-
-const app = new Clarifai.App({
- apiKey: '2a150ff9325f4fe6934be520ad8594a9'
-});
 
 const handleRegister = (req,res,db,bcrypt) => {
 	let { name, email, password } = req.body;

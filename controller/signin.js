@@ -1,4 +1,5 @@
-const handleSignin = (db, bcrypt) => (req, res ) =>  {
+const handleSignin = (req, res,db,bcrypt ) =>  {
+	console.log(req.body)
 
 	let { email, password } = req.body;
 	if(!email || !password){
