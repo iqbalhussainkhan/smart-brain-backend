@@ -49,7 +49,7 @@ app.put('/image/:id', (req,res) => {image.handleImage(req, res, db)});
 app.post('/handleAPICall', (req,res) => {image.handleAPICall(req, res)});
 
 
-app.listen(4000, () => {
-	console.log('app is runnnig')
+app.listen(process.env.PORT || 3000, () => {
+	console.log(`APP is runnining on ${process.env.PORT}`)
 })
 
