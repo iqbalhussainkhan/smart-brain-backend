@@ -14,11 +14,9 @@ const image = require('./controller/image');
 
 let db = knex({
   client: 'pg',
-  connection: {
-    host : 'postgresql-tetrahedral-37877',
-    user : 'postgres',
-    password : 'test',
-    database : 'smartbrain'
+  connection:{
+  	host: process.env.DATABASE_URL,
+  	ssl:true
   }
 });
 
@@ -28,9 +26,7 @@ app.use(cors())
 
 //home page 
 app.get('/', (req,res) => {
-	res.json('ITS WORKING')
-	// console.log('its workings');
-	// res.json(database.users)
+	res.json(database.users)
 })
 
 //signin route for user 
